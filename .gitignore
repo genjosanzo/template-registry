@@ -6,7 +6,6 @@
 # Files that might appear on external disk
 .Spotlight-V100
 .Trashes
-muleEmbeddedDB
 #Per developer properies
  *-hackthon.properties
 **/mule-app.properties
@@ -14,3 +13,12 @@ muleEmbeddedDB
 sf-report.txt
 bin/
 
+
+*.class
+
+# Package Files #
+*.jar
+*.war
+*.ear
+#DerbyDB folder
+muleEmbeddedDB
