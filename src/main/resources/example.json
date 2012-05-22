@@ -1,0 +1,44 @@
+[
+  {
+    "id": "org.eclipse.wst.xml.ui.internal.templates.comment",
+    "content": "\u003c!-- ${cursor} --\u003e",
+    "description": "xml comment",
+    "name": "comment"
+  },
+  {
+    "id": "org.eclipse.wst.xml.ui.internal.templates.defaultnsp",
+    "content": "xmlns\u003d\"default namespace\"",
+    "description": "Default Namespace Attribute",
+    "name": "default namespace"
+  },
+  {
+    "id": "org.eclipse.wst.xml.ui.internal.templates.noschemaLoc",
+    "content": "xsi:noNamespaceSchemaLocation\u003d\"{location}\"",
+    "description": "No Namespace Schema Location",
+    "name": "noschemaLoc"
+  },
+  {
+    "id": "org.eclipse.wst.xml.ui.internal.templates.schemaLoc",
+    "content": "xsi:schemaLocation\u003d\"{namespace} {location}\"",
+    "description": "XML Schema location attribute",
+    "name": "schemaLoc"
+  },
+  {
+    "id": "org.eclipse.wst.xml.ui.internal.templates.xmldeclaration",
+    "content": "\u003c?xml version\u003d\"1.0\" encoding\u003d\"${encoding}\"?\u003e",
+    "description": "xml declaration",
+    "name": "xml declaration"
+  },
+  {
+    "id": "org.eclipse.wst.xml.ui.internal.templates.xsinsp",
+    "content": "xmlns:xsi\u003d\"http://www.w3.org/2001/XMLSchema-instance\"",
+    "description": "XML Schema name space",
+    "name": "xsinsp"
+  },
+  {
+    "id": "org.eclipse.wst.xml.ui.internal.templates.xslpi",
+    "content": "\u003c?xml-stylesheet type\u003d\"text/xsl\" href\u003d\"${cursor}\"?\u003e",
+    "description": "XSL processing instruction",
+    "name": "XSL processing instruction"
+  }
+]

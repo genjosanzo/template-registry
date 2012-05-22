@@ -1,0 +1,15 @@
+.DS_Store
+
+# Thumbnails
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+
+#Per developer properies
+ *-hackthon.properties
+**/mule-app.properties
+#Removing sf-report text to keep them private
+sf-report.txt
+bin/

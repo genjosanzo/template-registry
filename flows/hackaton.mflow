@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mule-configuration xmlns="http://www.mulesoft.com/tooling/messageflow" name="hackaton">
+    <global-element type="http://www.mulesoft.org/schema/mule/ee/data-mapper/config" name="template_to_map" entity-id="e4a5b345-985d-4dd5-af47-34247035c4dc">
+        <properties>
+            <property value="template_to_map" name="name"/>
+            <property value="template_to_map.grf" name="transformationGraphPath"/>
+        </properties>
+    </global-element>
+    <global-element type="http://www.mulesoft.org/schema/mule/ee/jdbc/derby-data-source" name="Derby Data Source" entity-id="a99df3b8-732f-453c-b289-8c482bf20dc9">
+        <properties>
+            <property value="Derby_Data_Source" name="name"/>
+            <property name="user"/>
+            <property name="password"/>
+            <property value="jdbc:derby:muleEmbeddedDB;create=true" name="url"/>
+            <property value="UNSPECIFIED" name="transactionIsolation"/>
+            <property name="loginTimeout"/>
+            <property name="database"/>
+            <property name="create"/>
+        </properties>
+    </global-element>
+    <global-element type="http://www.mulesoft.org/schema/mule/ee/jdbc/connector" name="jdbcConnector" entity-id="6ab5c730-b0be-495f-a8b3-304a2abd0330">
+        <properties>
+            <property value="jdbcConnector" name="name"/>
+            <property value="Derby_Data_Source" name="dataSource-ref to JDBC DataSource"/>
+            <property value="Derby_Data_Source" name="dataSource-ref to Bean"/>
+            <property name="dispatcherPoolFactory-ref"/>
+            <property name="queryRunner-ref"/>
+            <property name="resultSetHandler-ref"/>
+            <property name="dynamicNotification"/>
+            <property value="true" name="validateConnections"/>
+            <property name="transactionPerMessage"/>
+            <property value="-1" name="queryTimeout"/>
+            <property value="0" name="pollingFrequency"/>
+            <property-collection name="@http://www.mulesoft.org/schema/mule/ee/jdbc/query;0">
+                <property value="select * from template" name="value"/>
+                <property value="select-templates" name="key"/>
+            </property-collection>
+            <property-collection name="@http://www.mulesoft.org/schema/mule/ee/jdbc/query;1">
+                <property value="INSERT INTO template (t_id,name,description,content) values(#[payload['id']],#[payload['name']],#[payload['description']],#[payload['content']])" name="value"/>
+                <property value="insert-template" name="key"/>
+            </property-collection>
+        </properties>
+    </global-element>
+    <global-element type="http://www.mulesoft.org/schema/mule/ee/data-mapper/config" name="listOfMap-to-json" entity-id="ae2a31b9-3301-414a-8ef6-9bd8fb01738b">
+        <properties>
+            <property value="listOfMap-to-json" name="name"/>
+            <property value="listofmap-to-json.grf" name="transformationGraphPath"/>
+        </properties>
+    </global-element>
+    <flow SubFlow="false" name="hackatonFlow1">
+        <properties>
+            <property name="processingStrategy2"/>
+            <property name="processingStrategy"/>
+            <property name="bussinessEventsLabel"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="USE_TRANSACTION_ID"/>
+            <property name="tracking:transaction-id"/>
+        </properties>
+        <lane entity-id="a47c4d81-ce77-4b07-8fe9-e6c9247760ff">
+            <endpoint message-exchange-pattern="OneWay" direction="Inbound" type="http://www.mulesoft.org/schema/mule/http/endpoint" name="HTTP" entity-id="11878175-bd49-473d-83ec-29f32c9fedf6">
+                <properties>
+                    <property value="one-way" name="exchange-pattern"/>
+                    <property value="request-response" name="exchange-pattern"/>
+                    <property value="http://www.mulesoft.org/schema/mule/http/endpoint" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property name="httpLabel"/>
+                    <property value="localhost" name="host"/>
+                    <property value="8081" name="port"/>
+                    <property name="path"/>
+                    <property name="method"/>
+                    <property name="businessEventsLabel"/>
+                    <property name="tracking:enable-default-events"/>
+                    <property name="address"/>
+                    <property name="encoding"/>
+                    <property name="disableTransportTransformer"/>
+                    <property name="mimeType"/>
+                    <property name="responseTimeout"/>
+                    <property name="followRedirects"/>
+                    <property name="connector-ref"/>
+                    <property name="ref"/>
+                    <property name="transformer-refs"/>
+                    <property name="responseTransformer-refs"/>
+                    <property name="user"/>
+                    <property name="password"/>
+                    <property name="contentType"/>
+                    <property name="keep-alive"/>
+                </properties>
+            </endpoint>
+            <pattern type="http://www.mulesoft.org/schema/mule/core/logger" name="Logger" entity-id="ac46f8d1-bfc5-4896-b012-a6c61e5d361a">
+                <properties>
+                    <property value="#[groovy:payload=='/init']" name="message"/>
+                    <property value="INFO" name="level"/>
+                    <property name="category"/>
+                </properties>
+            </pattern>
+            <splitter type="org.mule.tooling.ui.modules.core.pattern.cbr" name="Choice" entity-id="28d6c2ff-ae28-463a-be5c-6a0957d7a52e">
+                <properties>
+                    <property-collection name="f74261e2-8368-45d8-9e51-43826bbc6bd4">
+                        <property value="true" name="choice.otherwise"/>
+                    </property-collection>
+                    <property-collection name="dc0913fb-6f55-417c-831a-65528af0b174">
+                        <property value="payload=='/init' " name="choice.expression"/>
+                        <property value="groovy" name="choice.evaluator"/>
+                    </property-collection>
+                    <property-collection name="e79d9727-3d73-430d-9427-9062ff2c972c">
+                        <property value="message.getInboundProperty('http.method') == 'GET'" name="choice.expression"/>
+                        <property value="groovy" name="choice.evaluator"/>
+                    </property-collection>
+                </properties>
+                <pattern type="org.mule.tooling.ui.modules.core.pattern.cbr" name="Choice" entity-id="e8b76e75-90cb-4cbf-aff1-cac2d4a1e665">
+                    <properties>
+                        <property-collection name="f74261e2-8368-45d8-9e51-43826bbc6bd4">
+                            <property value="true" name="choice.otherwise"/>
+                        </property-collection>
+                        <property-collection name="dc0913fb-6f55-417c-831a-65528af0b174">
+                            <property value="payload=='/init' " name="choice.expression"/>
+                            <property value="groovy" name="choice.evaluator"/>
+                        </property-collection>
+                        <property-collection name="e79d9727-3d73-430d-9427-9062ff2c972c">
+                            <property value="message.getInboundProperty('http.method') == 'GET'" name="choice.expression"/>
+                            <property value="groovy" name="choice.evaluator"/>
+                        </property-collection>
+                    </properties>
+                </pattern>
+                <compartment entity-id="c6d52dfa-aa7d-4465-83a3-7e75a2181e37">
+                    <lane entity-id="dc0913fb-6f55-417c-831a-65528af0b174">
+                        <pattern type="http://www.mulesoft.org/schema/mule/scripting/groovyComponent" name="Script" entity-id="82deb5e7-c365-43a2-ad33-3e7d380833e6">
+                            <properties>
+<property-collection name="@http://www.mulesoft.org/schema/mule/scripting/script;0">
+    <property value="jdbcConnector = muleContext.getRegistry().lookupConnector(&quot;jdbcConnector&quot;);&#xA;qr = jdbcConnector.getQueryRunner();&#xA;conn = jdbcConnector.getConnection();&#xA;qr.update(conn, &quot;CREATE TABLE template(ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (start with 0, increment by 1) , t_id varchar(256), name varchar(256), description varchar(256), content varchar(512))&quot;);&#xA;return payload" name="text"/>
+    <property value="Groovy" name="engine"/>
+    <property value="true" name="isProcessed$$$$"/>
+</property-collection>
+                            </properties>
+                        </pattern>
+                    </lane>
+                    <lane entity-id="e79d9727-3d73-430d-9427-9062ff2c972c">
+                        <pattern type="http://www.mulesoft.org/schema/mule/core/logger" name="Logger" entity-id="0e6a0aa3-bdb0-4db0-a28e-a3f7c76dd792">
+                            <properties>
+<property value="Retrieving the templates" name="message"/>
+<property value="ERROR" name="level"/>
+<property name="category"/>
+                            </properties>
+                        </pattern>
+                        <pattern type="http://www.mulesoft.org/schema/mule/scripting/groovyComponent" name="Script" entity-id="f86c07d0-65da-41a2-ad35-d5385ff8130d">
+                            <properties>
+<property-collection name="@http://www.mulesoft.org/schema/mule/scripting/script;0">
+    <property value="if(payload.indexOf('?') == -1)&#xA;&#x9;return ''&#xA;else &#xA;&#x9;payload = payload.substring(payload.indexOf('?')+1,payload.length())&#xA;&#x9;log.info(payload)&#xA;&#x9;queryParams = payload.split('&amp;')&#xA;&#x9;def where &#xA;&#x9;queryParams.each ({ it-&gt;&#xA;&#x9;&#x9;def whereConditions = it.split('=')&#xA;&#x9;&#x9;where =  whereConditions[1] &#xA;&#x9;})&#xA;&#x9;log.info(where)&#xA;&#x9;&#xA;&#x9;&#xA;return where" name="text"/>
+    <property value="Groovy" name="engine"/>
+    <property value="true" name="isProcessed$$$$"/>
+</property-collection>
+                            </properties>
+                        </pattern>
+                        <pattern type="http://www.mulesoft.org/schema/mule/core/logger" name="Logger" entity-id="bcb274e0-82de-49c7-8f02-0142ed31485b">
+                            <properties>
+<property value="'#[payload]'" name="message"/>
+<property value="INFO" name="level"/>
+<property name="category"/>
+                            </properties>
+                        </pattern>
+                        <scope type="http://www.mulesoft.org/schema/mule/ee/core/cache" name="Cache" entity-id="66d7ecbd-c95f-4b34-bf84-00887bc943b8">
+                            <properties>
+<property name="cachingStrategy-ref"/>
+<property name="filterLabel"/>
+<property name="dont_use"/>
+<property name="use_an_expression"/>
+<property name="filterExpression"/>
+<property name="use_a_filter"/>
+<property name="filter-ref"/>
+                            </properties>
+                            <compartment entity-id="c3bb4f00-3df5-4cd0-9ada-56f7284b1fec">
+<lane entity-id="24f9247d-0d89-49a2-acc9-7928bf3fca8e">
+    <endpoint message-exchange-pattern="OneWay" direction="Outbound" type="http://www.mulesoft.org/schema/mule/ee/jdbc/endpoint" name="Database (JDBC)" entity-id="3e1953c3-7c17-4894-9be6-b95c9db1f729">
+        <properties>
+            <property value="one-way" name="exchange-pattern"/>
+            <property value="request-response" name="exchange-pattern"/>
+            <property name=""/>
+            <property value="select-templates" name="queryKey"/>
+            <property name="businessEventsLabel"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="address"/>
+            <property name="responseTimeout"/>
+            <property name="encoding"/>
+            <property name="disableTransportTransformer"/>
+            <property name="mimeType"/>
+            <property value="-1" name="queryTimeout"/>
+            <property name="pollingFrequency"/>
+            <property value="jdbcConnector" name="connector-ref"/>
+            <property name="ref"/>
+            <property name="transformer-refs"/>
+            <property name="responseTransformer-refs"/>
+        </properties>
+    </endpoint>
+    <pattern type="http://www.mulesoft.org/schema/mule/core/logger" name="Logger" entity-id="8182aec7-213c-4cb0-b5da-e186ac1752ae">
+        <properties>
+            <property value="Payload now is #[groovy:payload.get(0)]]" name="message"/>
+            <property value="ERROR" name="level"/>
+            <property name="category"/>
+        </properties>
+    </pattern>
+    <pattern type="http://www.mulesoft.org/schema/mule/ee/data-mapper/data-mapper-connector" name="Data-mapper" entity-id="5150cdb3-24b6-441f-9971-e4b651414226">
+        <properties>
+            <property value="listOfMap-to-json" name="config-ref"/>
+            <property value="http://www.mulesoft.org/schema/mule/ee/data-mapper/transform" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+            <property value="listOfMap-to-json" name="config-ref"/>
+            <property name="input-ref"/>
+        </properties>
+    </pattern>
+</lane>
+                            </compartment>
+                        </scope>
+                    </lane>
+                    <lane entity-id="f74261e2-8368-45d8-9e51-43826bbc6bd4">
+                        <pattern type="http://www.mulesoft.org/schema/mule/core/object-to-string-transformer" name="Object to String" entity-id="d0dbb2ab-6511-4638-8f77-a98aa1a2c99d">
+                            <properties>
+<property name="returnClass"/>
+<property name="ignoreBadInput"/>
+<property name="encoding"/>
+<property name="mimeType"/>
+                            </properties>
+                        </pattern>
+                        <pattern type="http://www.mulesoft.org/schema/mule/core/logger" name="Logger" entity-id="b5512eef-d16b-457d-a1f8-55104b6ea321">
+                            <properties>
+<property value="#[payload]" name="message"/>
+<property value="INFO" name="level"/>
+<property name="category"/>
+                            </properties>
+                        </pattern>
+                        <pattern type="http://www.mulesoft.org/schema/mule/ee/data-mapper/data-mapper-connector" name="Data-mapper" entity-id="19409d66-2633-4ff1-81e8-918751305364">
+                            <properties>
+<property value="#[payload]" name="input-ref"/>
+<property value="http://www.mulesoft.org/schema/mule/ee/data-mapper/transform" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+<property value="template_to_map" name="config-ref"/>
+<property-collection name="@http://www.mulesoft.org/schema/mule/ee/data-mapper/input-arguments;471507829">
+    <property value="true" name="isProcessed$$$$"/>
+</property-collection>
+                            </properties>
+                            <description></description>
+                        </pattern>
+                        <pattern type="http://www.mulesoft.org/schema/mule/core/logger" name="Logger" entity-id="d35375dc-1e52-409c-97f3-06d87f0d5d58">
+                            <properties>
+<property value="#[groovy:payload.getClass()]" name="message"/>
+<property value="ERROR" name="level"/>
+<property name="category"/>
+                            </properties>
+                        </pattern>
+                        <scope type="http://www.mulesoft.org/schema/mule/core/foreach" name="Foreach" entity-id="63061594-836b-4b7a-88d9-b9afd6b57c89">
+                            <properties>
+<property name="collection"/>
+<property name="counterVariableName"/>
+<property name="batchSize"/>
+<property name="rootMessageVariableName"/>
+                            </properties>
+                            <compartment entity-id="26f896c6-2858-4e4d-9a82-0b764d96de46">
+<lane entity-id="a6d2c445-b944-42b3-bf76-5800dbaf7d8c">
+    <pattern type="http://www.mulesoft.org/schema/mule/core/logger" name="Logger" entity-id="f58f8c3c-9a95-47cd-8e11-544480d96bba">
+        <properties>
+            <property value="#[groovy:payload.getClass()]" name="message"/>
+            <property value="ERROR" name="level"/>
+            <property name="category"/>
+        </properties>
+    </pattern>
+    <pattern type="http://www.mulesoft.org/schema/mule/core/logger" name="Logger" entity-id="c91ff0f4-8cc8-4e4c-b518-3aff4bcd9b21">
+        <properties>
+            <property value="#[payload['id']]" name="message"/>
+            <property value="ERROR" name="level"/>
+            <property name="category"/>
+        </properties>
+    </pattern>
+    <endpoint message-exchange-pattern="OneWay" direction="Outbound" type="http://www.mulesoft.org/schema/mule/ee/jdbc/endpoint" name="Database (JDBC)" entity-id="6bcb9ddf-09dd-439d-9592-24babfd7d2d5">
+        <properties>
+            <property value="one-way" name="exchange-pattern"/>
+            <property value="one-way" name="exchange-pattern"/>
+            <property name=""/>
+            <property value="insert-template" name="queryKey"/>
+            <property name="businessEventsLabel"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="address"/>
+            <property name="responseTimeout"/>
+            <property name="encoding"/>
+            <property name="disableTransportTransformer"/>
+            <property name="mimeType"/>
+            <property value="-1" name="queryTimeout"/>
+            <property name="pollingFrequency"/>
+            <property value="jdbcConnector" name="connector-ref"/>
+            <property name="ref"/>
+            <property name="transformer-refs"/>
+            <property name="responseTransformer-refs"/>
+        </properties>
+    </endpoint>
+</lane>
+                            </compartment>
+                        </scope>
+                    </lane>
+                </compartment>
+            </splitter>
+        </lane>
+    </flow>
+</mule-configuration>

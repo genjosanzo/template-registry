@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:jdbc="http://www.mulesoft.org/schema/mule/ee/jdbc" xmlns:data-mapper="http://www.mulesoft.org/schema/mule/ee/data-mapper" xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:core="http://www.mulesoft.org/schema/mule/core" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="EE-3.3.0" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+http://www.mulesoft.org/schema/mule/ee/jdbc http://www.mulesoft.org/schema/mule/ee/jdbc/current/mule-jdbc-ee.xsd 
+http://www.mulesoft.org/schema/mule/ee/data-mapper http://www.mulesoft.org/schema/mule/ee/data-mapper/3.2/mule-data-mapper.xsd 
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd 
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd 
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/3.2/mule-tracking-ee.xsd ">
+    <data-mapper:config name="template_to_map" transformationGraphPath="template_to_map.grf" doc:name="template_to_map"/>
+    <jdbc:derby-data-source name="Derby_Data_Source" url="jdbc:derby:muleEmbeddedDB;create=true" transactionIsolation="UNSPECIFIED" doc:name="Derby Data Source"/>
+    <jdbc:connector name="jdbcConnector" dataSource-ref="Derby_Data_Source" validateConnections="true" queryTimeout="-1" pollingFrequency="0" doc:name="jdbcConnector">
+        <jdbc:query key="select-templates" value="select * from template"/>
+        <jdbc:query key="insert-template" value="INSERT INTO template (t_id,name,description,content) values(#[payload['id']],#[payload['name']],#[payload['description']],#[payload['content']])"/>
+    </jdbc:connector>
+    <data-mapper:config name="listOfMap-to-json" transformationGraphPath="listofmap-to-json.grf" doc:name="listOfMap-to-json"/>
+    <flow name="hackatonFlow1" doc:name="hackatonFlow1">
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="8081" doc:name="HTTP"/>
+        <logger message="#[groovy:payload=='/init']" level="INFO" doc:name="Logger"/>
+        <choice doc:name="Choice">
+            <when expression="payload=='/init' " evaluator="groovy">
+                <processor-chain>
+                    <scripting:component doc:name="Script">
+                        <scripting:script engine="Groovy">
+                            <scripting:text><![CDATA[jdbcConnector = muleContext.getRegistry().lookupConnector("jdbcConnector");
+qr = jdbcConnector.getQueryRunner();
+conn = jdbcConnector.getConnection();
+qr.update(conn, "CREATE TABLE template(ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (start with 0, increment by 1) , t_id varchar(256), name varchar(256), description varchar(256), content varchar(512))");
+return payload]]></scripting:text>
+                        </scripting:script>
+                    </scripting:component>
+                </processor-chain>
+            </when>
+            <when expression="message.getInboundProperty('http.method') == 'GET'" evaluator="groovy">
+                <processor-chain>
+                    <logger message="Retrieving the templates" level="ERROR" doc:name="Logger"/>
+                    <scripting:component doc:name="Script">
+                        <scripting:script engine="Groovy">
+                            <scripting:text><![CDATA[if(payload.indexOf('?') == -1)
+	return ''
+else 
+	payload = payload.substring(payload.indexOf('?')+1,payload.length())
+	log.info(payload)
+	queryParams = payload.split('&')
+	def where 
+	queryParams.each ({ it->
+		def whereConditions = it.split('=')
+		where =  whereConditions[1] 
+	})
+	log.info(where)
+	
+	
+return where]]></scripting:text>
+                        </scripting:script>
+                    </scripting:component>
+                    <logger message="'#[payload]'" level="INFO" doc:name="Logger"/>
+                    <ee:cache doc:name="Cache">
+                        <jdbc:outbound-endpoint exchange-pattern="request-response" queryKey="select-templates" queryTimeout="-1" connector-ref="jdbcConnector" doc:name="Database (JDBC)"/>
+                        <logger message="Payload now is #[groovy:payload.get(0)]]" level="ERROR" doc:name="Logger"/>
+                        <data-mapper:transform config-ref="listOfMap-to-json" doc:name="Data-mapper"/>
+                    </ee:cache>
+                </processor-chain>
+            </when>
+            <otherwise>
+                <processor-chain>
+                    <object-to-string-transformer doc:name="Object to String"/>
+                    <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+                    <data-mapper:transform config-ref="template_to_map" doc:name="Data-mapper"/>
+                    <logger message="#[groovy:payload.getClass()]" level="ERROR" doc:name="Logger"/>
+                    <foreach doc:name="Foreach">
+                        <logger message="#[groovy:payload.getClass()]" level="ERROR" doc:name="Logger"/>
+                        <logger message="#[payload['id']]" level="ERROR" doc:name="Logger"/>
+                        <jdbc:outbound-endpoint exchange-pattern="one-way" queryKey="insert-template" queryTimeout="-1" connector-ref="jdbcConnector" doc:name="Database (JDBC)"/>
+                    </foreach>
+                </processor-chain>
+            </otherwise>
+        </choice>
+    </flow>
+</mule>

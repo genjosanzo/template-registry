@@ -1,0 +1,10 @@
+----------------------------------------------------------------
+Thu May 10 16:06:38 PDT 2012:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.8.2.2 - (1181258): instance a816c00e-0137-3901-0a56-0000036ffdf8 
+on database directory /Users/alberto/MuleStudio/workspace/hackaton-1/muleEmbeddedDB  with class loader sun.misc.Launcher$AppClassLoader@69cd2e5f 
+Loaded from file:/Users/alberto/.m2/repository/org/apache/derby/derby/10.8.2.2/derby-10.8.2.2.jar
+java.vendor=Apple Inc.
+java.runtime.version=1.6.0_31-b04-415-11M3646
+user.dir=/Users/alberto/MuleStudio/workspace/hackaton-1
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''

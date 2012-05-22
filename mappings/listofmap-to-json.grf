@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Graph author="alberto" created="Thu May 10 11:06:08 PDT 2012" guiVersion="3.3.0.M2" id="1336684450953" licenseCode="Unlicensed" licenseType="Unknown" modified="Thu May 10 11:06:08 PDT 2012" modifiedBy="alberto" name="listOfMap-to-json" revision="1.0" showComponentDetails="false">
+<Global>
+<Metadata __sourcePath="{}/array" _dataStructure="SINGLE_DIMENSIONAL_COLLECTION" _id="__id" _type="Output" id="Metadata0">
+<Record fieldDelimiter="|" name="__singleDimensionalCollection_1" recordDelimiter="&#10;" type="delimited">
+<Field __artificialType="_id" __systemManaged="true" name="__id" type="string"/>
+<Field __sourcePath="{}/array/id" label="id" name="id" type="string"/>
+<Field __sourcePath="{}/array/content" label="content" name="content" type="string"/>
+<Field __sourcePath="{}/array/description" label="description" name="description" type="string"/>
+<Field __sourcePath="{}/array/name" label="name" name="name" type="string"/>
+</Record>
+</Metadata>
+<Metadata __sourcePath="{}/inputMetadata" _dataStructure="SINGLE_DIMENSIONAL_COLLECTION" _id="__id" _type="Input" id="80b10bcd-bb38-4ba0-9b62-7e0eb1f02f2f">
+<Record fieldDelimiter="|" label="inputMetadata" name="inputMetadata" recordDelimiter="&#10;" type="delimited">
+<Field __artificialType="_id" __systemManaged="true" name="__id" type="string"/>
+<Field __sourcePath="{=}/inputMetadata/T_ID" containerType="" name="T_ID" type="string"/>
+<Field __sourcePath="{=}/inputMetadata/CONTENT" containerType="" name="CONTENT" type="string"/>
+<Field __sourcePath="{=}/inputMetadata/NAME" containerType="" name="NAME" type="string"/>
+<Field __sourcePath="{=}/inputMetadata/DESCRIPTION" containerType="" name="DESCRIPTION" type="string"/>
+</Record>
+</Metadata>
+<Dictionary>
+<Entry id="DictionaryEntry0" input="true" name="inputPayload" output="false" type="object"/>
+<Entry id="DictionaryEntry1" input="false" name="outputPayload" output="true" type="object"/>
+</Dictionary>
+</Global>
+<Phase number="0">
+<Node enabled="enabled" fileURL="dict:inputPayload" guiHeight="0" guiName="MAP Reader" guiWidth="0" guiX="20" guiY="20" id="BEAN_READER0" type="BEAN_READER">
+<attr name="mapping"><![CDATA[<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Context outPort="0" sequenceField="__id" xpath=".">
+  <Mapping cloverField="T_ID" trim="true" xpath="T_ID"/>
+  <Mapping cloverField="CONTENT" trim="true" xpath="CONTENT"/>
+  <Mapping cloverField="NAME" trim="true" xpath="NAME"/>
+  <Mapping cloverField="DESCRIPTION" trim="true" xpath="DESCRIPTION"/>
+</Context>
+]]></attr>
+<attr name="_data_format"><![CDATA[MAP]]></attr>
+</Node>
+<Node charset="UTF-8" enabled="enabled" fileURL="dict:outputPayload" guiHeight="0" guiName="JSON Writer" guiWidth="0" guiX="460" guiY="20" id="JSON_WRITER0" type="JSON_WRITER">
+<attr name="mapping"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<clover:collection clover:name="array" xmlns:clover="http://www.cloveretl.com/ns/xmlmapping">
+  <item clover:inPort="0">
+    <id>$0.id</id>
+    <content>$0.content</content>
+    <description>$0.description</description>
+    <name>$0.name</name>
+  </item>
+</clover:collection>]]></attr>
+<attr name="_data_format"><![CDATA[JSON]]></attr>
+</Node>
+<Node enabled="enabled" guiHeight="0" guiName="inputMetadata_to_json" guiWidth="0" guiX="240" guiY="20" id="REFORMAT0" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.description = $in.0.DESCRIPTION;
+	$out.0.name = $in.0.NAME;
+	$out.0.content = $in.0.CONTENT;
+	$out.0.id = $in.0.T_ID;
+	
+	
+	
+	
+$out.0.__id=$in.0.__id;
+		return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Edge fromNode="BEAN_READER0:0" guiBendpoints="" id="Edge0" inPort="Port 0 (in)" metadata="80b10bcd-bb38-4ba0-9b62-7e0eb1f02f2f" outPort="Port 0 (out)" toNode="REFORMAT0:0"/>
+<Edge fromNode="REFORMAT0:0" guiBendpoints="" id="Edge1" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="JSON_WRITER0:0"/>
+</Phase>
+</Graph>

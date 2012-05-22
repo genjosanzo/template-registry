@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Graph author="machaval" created="Thu May 10 13:17:02 GMT-03:00 2012" guiVersion="3.3.0.M2" id="1336667381785" licenseCode="Unlicensed" licenseType="Commercial" modified="Thu May 10 13:17:02 GMT-03:00 2012" modifiedBy="machaval" name="template_to_map" preview-file="/Users/alberto/Downloads/templates.xml" revision="1.0" showComponentDetails="false">
+<Global>
+<Metadata __sourcePath="{}/outputMetadata" _dataStructure="SINGLE_DIMENSIONAL_COLLECTION" _id="__id" _type="Output" id="ce19c572-b8a6-4653-99f6-c8b931c59642">
+<Record fieldDelimiter="|" label="outputMetadata" name="outputMetadata" recordDelimiter="&#10;" type="delimited">
+<Field __artificialType="_id" __systemManaged="true" name="__id" type="string"/>
+<Field __sourcePath="{=}/outputMetadata/content" name="content" type="string"/>
+<Field __sourcePath="{=}/outputMetadata/id" name="id" type="string"/>
+<Field __sourcePath="{=}/outputMetadata/name" name="name" type="string"/>
+<Field __sourcePath="{=}/outputMetadata/description" name="description" type="string"/>
+</Record>
+</Metadata>
+<Metadata __sourcePath="{=}/templates/template" _dataStructure="OBJECT" _id="__id" _type="Input" id="Metadata0">
+<Record fieldDelimiter="|" name="templateType" recordDelimiter="&#10;" type="delimited">
+<Field __artificialType="_id" __systemManaged="true" name="__id" type="string"/>
+<Field __sourcePath="{=}/templates/template/text()" label="text()" name="text" type="string"/>
+<Field __sourcePath="{=}/templates/template/@autoinsert" label="autoinsert" name="autoinsert" type="string"/>
+<Field __sourcePath="{=}/templates/template/@context" label="context" name="context" type="string"/>
+<Field __sourcePath="{=}/templates/template/@deleted" label="deleted" name="deleted" type="string"/>
+<Field __sourcePath="{=}/templates/template/@description" label="description" name="description" type="string"/>
+<Field __sourcePath="{=}/templates/template/@enabled" label="enabled" name="enabled" type="string"/>
+<Field __sourcePath="{=}/templates/template/@id" label="id" name="id" type="string"/>
+<Field __sourcePath="{=}/templates/template/@name" label="name" name="name" type="string"/>
+</Record>
+</Metadata>
+<Dictionary>
+<Entry id="DictionaryEntry0" input="true" name="inputPayload" output="false" type="object"/>
+<Entry id="DictionaryEntry1" input="false" name="outputPayload" output="true" type="object"/>
+</Dictionary>
+</Global>
+<Phase number="0">
+<Node enabled="enabled" fileURL="dict:outputPayload" guiHeight="0" guiName="MAP Writer" guiWidth="0" guiX="460" guiY="20" id="MAP_WRITER0" type="MAP_WRITER">
+<attr name="mapping"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<clover:collection clover:name="outputMetadata" xmlns:clover="http://www.cloveretl.com/ns/xmlmapping">
+  <item clover:inPort="0">
+    <content>$0.content</content>
+    <id>$0.id</id>
+    <name>$0.name</name>
+    <description>$0.description</description>
+  </item>
+</clover:collection>]]></attr>
+<attr name="_data_format"><![CDATA[MAP]]></attr>
+</Node>
+<Node enabled="enabled" guiHeight="0" guiName="template_to_map" guiWidth="0" guiX="240" guiY="20" id="REFORMAT0" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.description = $in.0.description;
+	$out.0.name = $in.0.name;
+	$out.0.id = $in.0.id;
+	$out.0.content = $in.0.text;
+$out.0.__id=$in.0.__id;
+		return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Node charset="UTF-8" enabled="enabled" fileURL="dict:inputPayload" guiHeight="0" guiName="XML Reader" guiWidth="0" guiX="20" guiY="20" id="XML_READER0" type="XML_READER">
+<attr name="xmlSchemaURL"><![CDATA[/Users/machaval/labs//templates.xsd]]></attr>
+<attr name="mapping"><![CDATA[<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Context outPort="0" sequenceField="__id" xpath="/templates/template">
+  <Mapping cloverField="text" trim="true" xpath="text()"/>
+  <Mapping cloverField="autoinsert" trim="true" xpath="@autoinsert"/>
+  <Mapping cloverField="context" trim="true" xpath="@context"/>
+  <Mapping cloverField="deleted" trim="true" xpath="@deleted"/>
+  <Mapping cloverField="description" trim="true" xpath="@description"/>
+  <Mapping cloverField="enabled" trim="true" xpath="@enabled"/>
+  <Mapping cloverField="id" trim="true" xpath="@id"/>
+  <Mapping cloverField="name" trim="true" xpath="@name"/>
+</Context>
+]]></attr>
+<attr name="_data_format"><![CDATA[XML]]></attr>
+</Node>
+<Edge fromNode="REFORMAT0:0" guiBendpoints="" id="Edge1" inPort="Port 0 (in)" metadata="ce19c572-b8a6-4653-99f6-c8b931c59642" outPort="Port 0 (out)" toNode="MAP_WRITER0:0"/>
+<Edge fromNode="XML_READER0:0" guiBendpoints="" id="Edge0" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="REFORMAT0:0"/>
+</Phase>
+</Graph>
